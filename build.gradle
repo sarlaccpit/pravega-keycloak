@@ -69,7 +69,11 @@ subprojects {
 
 project('client') {
     apply from: "$rootDir/gradle/maven-publish.gradle"
-
+    
+    task showVersion(type: Task) {
+        System.out.println("VERSION: " + version)
+    }
+    
     configurations {
         implementation {
             exclude group: 'org.projectlombok', module: 'lombok'
