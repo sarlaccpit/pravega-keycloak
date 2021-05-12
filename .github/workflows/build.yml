@@ -35,4 +35,4 @@ jobs:
       - name: show version
         run: ./gradlew showVersion
       - name: Publish Shapshot
-        run: ./gradlew publish PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
+        run: ./gradlew publish -PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
