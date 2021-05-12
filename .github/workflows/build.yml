@@ -22,11 +22,16 @@ jobs:
     steps:
       - name: Build Information
         run: echo Building a '${{ github.event_name }}' for target '${{ github.ref }}'.
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
       - name: Gradle build
         run: ./gradlew build
       - name: show version
         run: ./gradlew showVersion
       - name: Publish Shapshot
-        run: ./gradlew publish -PpublishUrl=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
+        run: ./gradlew publish PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
