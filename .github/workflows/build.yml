@@ -26,6 +26,7 @@ jobs:
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
+          key: global
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
