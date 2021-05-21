@@ -57,7 +57,5 @@ jobs:
           with:
             key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
             path: ${{env.BUILD_CACHE_PATH}}     
-        - name: show version 
-          run: ./gradlew showVersion
         - name: Publish Shapshot
           run: ./gradlew publish -PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
