@@ -36,7 +36,7 @@ jobs:
       - name: Cache Build Output
         uses: actions/cache@v2
         with:
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{github.ref}}-${{github.run_id}}-${{github.job}}
           path: ${{env.BUILD_CACHE_PATH}}     
       - name: Gradle build
         run: ./gradlew build
@@ -55,7 +55,7 @@ jobs:
         - name: Cache Build Output
           uses: actions/cache@v2
           with:
-            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            key: ${{github.ref}}-${{github.run_id}}-${{github.job}}
             path: ${{env.BUILD_CACHE_PATH}}     
         - name: Publish Shapshot
           run: ./gradlew publish -PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
