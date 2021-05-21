@@ -44,7 +44,7 @@ jobs:
   snapshot:
       name: Optional snapshot to Github Packages
       needs: [build]
-      if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/githubactions' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/r0.') || startsWith(github.ref, 'refs/heads/r1.')) }}
+      if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/r0.') || startsWith(github.ref, 'refs/heads/r1.')) }}
       runs-on: ubuntu-latest
       steps:
         - name: Cache Gradle packages
