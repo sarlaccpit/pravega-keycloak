@@ -3,36 +3,61 @@
 name: build
 
 # Controls when the action will run. 
-on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-  pull_request:
+on: [push, pull_request, workflow_dispatch]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+env:
+  GRADLE_MODULES_CACHE:
+    gradle_cache
+  GRADLE_MODULES_PATH: |
+    ~/.gradle/caches
+    ~/.gradle/wrapper    
+  BUILD_CACHE_PATH:
+    ./client/build
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
+    name: Main build
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Build Information
-        run: echo Building a '${{ github.event_name }}' for target '${{ github.ref }}'.
-      - uses: actions/checkout@v2
+        run: echo Event '${{ github.event_name }}' for branch '${{ github.ref }}'.
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
-          key: global
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
+          key: ${{env.GRADLE_MODULES_CACHE}}
+          path: ${{env.GRADLE_MODULES_PATH}}
+      - name: Cache Build Output
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          path: ${{env.BUILD_CACHE_PATH}}     
       - name: Gradle build
         run: ./gradlew build
-      - name: show version
-        run: ./gradlew showVersion
-      - name: Publish Shapshot
-        run: ./gradlew publish -PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
+  
+  snapshot:
+      name: Optional snapshot to Github Packages
+      needs: [build]
+      if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/r0.') || startsWith(github.ref, 'refs/heads/r1.')) }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Cache Gradle packages
+          uses: actions/cache@v2
+          with:
+            key: ${{env.GRADLE_MODULES_CACHE}}
+            path: ${{env.GRADLE_MODULES_PATH}}
+        - name: Cache Build Output
+          uses: actions/cache@v2
+          with:
+            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            path: ${{env.BUILD_CACHE_PATH}}     
+        - name: show version 
+          run: ./gradlew showVersion
+        - name: Publish Shapshot
+          run: ./gradlew publish -PpublishRepo=Custom -PpublishUrlForSnapshots=https://maven.pkg.github.com/${{github.repository}} -PpublishUsername=${{github.actor}} -PpublishPassword=${{secrets.GITHUB_TOKEN}} ${{env.GRADLE_OPTS}}
